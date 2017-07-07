@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+	content="width=device-width,initial-scale=1,user-scalable=0" />
+<meta name="viewport"
+	content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no">
+<meta name="format-detection" content="telephone=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta http-equiv="pragma" content="no-cache" />
+
+
+<title>幸运大转盘</title>
+<!-- 引入 WeUI -->
+<link rel="stylesheet" th:href="@{/css/weui/dist/style/weui.css}" />
+<link rel="stylesheet"
+	href="//cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.min.css">
+<!-- 转盘css -->
+<link rel="stylesheet" th:href="@{/css/lottery/style.css}" />
+<link rel="stylesheet" th:href="@{/css/lottery/lottery.css}" />
+</head>
+<body class="activity-lottery-winning">
+
+	<div class="main">
+		<div id="outercont">
+			<div id="outer-cont" style="overflow: hidden;">
+				<div id="outer">
+					<img src="../../img/lottery/activity-lottery-1.png" width="310px" />
+				</div>
+			</div>
+			<div id="inner-cont">
+				<div id="inner">
+					<img src="../../img/lottery/activity-lottery-2.png" />
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<div
+		style="max-width: 380px; text-align: center; color: azure; margin: 0 auto;">
+		剩余抽奖次数：<span id="lotteryCount" th:text="${lotteryCount}">0</span>次
+	</div>
+
+	<div style="max-width: 380px; margin: 10px auto 0px auto;">
+		<div
+			style="padding: 0 5px 0px 5px; font-weight: bold; font-size: 16px;">抽奖说明</div>
+		<div
+			style="padding: 0 10px 0px 20px; margin-top: 5px; font-size: 14px; font-weight: bold;">
+			*关注公众号:
+			<p style="padding: 0 2px 0px 8px; font-size: 14px;">
+				关注公众号可获取5次抽奖机会<a href="javascript:void(0);" onclick="showQRCode()">（点击获取二维码关注）</a>
+			</p>
+		</div>
+		<div
+			style="padding: 0 10px 0px 20px; font-size: 14px; font-weight: bold;">
+			*分享该活动:
+			<p style="padding: 0 2px 0px 8px; font-size: 14px;">每日分享（点击页面下方的<a href="#shareM">分享按钮</a>进行分享）可以获取10次抽奖机会</p>
+		</div>
+	</div>
+
+	<div style="max-width: 380px; margin: 10px auto 0px auto;">
+		<div
+			style="padding: 0 5px 0px 5px; font-weight: bold; font-size: 16px;">奖品设置</div>
+		<div
+			style="padding: 0 10px 0px 20px; margin-top: 10px; font-size: 14px; font-weight: bold;">
+			*一等奖:
+			<p style="padding: 0 2px 0px 8px; font-size: 14px;">爱奇艺会员12个月</p>
+		</div>
+		<div
+			style="padding: 0 10px 0px 20px; font-size: 14px; font-weight: bold;">
+			*二等奖:
+			<p style="padding: 0 2px 0px 8px; font-size: 14px;">爱奇艺会员6个月</p>
+		</div>
+		<div
+			style="padding: 0 10px 0px 20px; font-size: 14px; font-weight: bold;">
+			*三等奖:
+			<p style="padding: 0 2px 0px 8px; font-size: 14px;">爱奇艺会员1个月</p>
+		</div>
+	</div>
+
+
+
+	<div class="weui-btn-area" style="margin-top: 50px">
+		<a href="/marketing/getaward" class="weui-btn weui-btn_primary">领取</a>
+		<a href="javascript:;" class="weui-btn weui-btn_default" id="shareM">分享到朋友圈</a>
+	</div>
+
+
+	<div class="weui-share"
+		onclick="$(this).fadeOut();$(this).removeClass('fadeOut')">
+		<div class="weui-share-box">
+			点击右上角分享到朋友圈 <i></i>
+		</div>
+	</div>
+</body>
+<!-- 引入js -->
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script th:src="@{/js/weuijs/dist/weui.js}" type="text/javascript"></script>
+<script th:src="@{/js/jquery-3.2.1.js}" type="text/javascript"></script>
+<script th:src="@{/js/jQueryRotate.2.2.js}" type="text/javascript"></script>
+<script th:src="@{/js/jquery.easing.min.js}" type="text/javascript"></script>
+<script th:src="@{/js/jquery-weui/dist/js/jquery-weui.min.js}"></script>
+<script th:src="@{/js/jquery-weui/dist/js/swiper.min.js}"></script>
+<script th:inline="javascript" type="text/javascript">
+
+
+wx.config({
+    debug: false,
+    appId: [[${appid}]],
+    timestamp: [[${timestamp}]],
+    nonceStr: [[${nonceStr}]],
+    signature: [[${signature}]],
+    jsApiList: [
+      'onMenuShareTimeline',
+      'onMenuShareAppMessage'
+    ]
+});
+
+
+
+
+/*
+ * 注意：
+ * 1. 所有的JS接口只能在公众号绑定的域名下调用，公众号开发者需要先登录微信公众平台进入“公众号设置”的“功能设置”里填写“JS接口安全域名”。
+ * 2. 如果发现在 Android 不能分享自定义内容，请到官网下载最新的包覆盖安装，Android 自定义分享接口需升级至 6.0.2.58 版本及以上。
+ * 3. 完整 JS-SDK 文档地址：http://mp.weixin.qq.com/wiki/7/aaa137b55fb2e0456bf8dd9148dd613f.html
+ *
+ * 如有问题请通过以下渠道反馈：
+ * 邮箱地址：weixin-open@qq.com
+ * 邮件主题：【微信JS-SDK反馈】具体问题
+ * 邮件内容说明：用简明的语言描述问题所在，并交代清楚遇到该问题的场景，可附上截屏图片，微信团队会尽快处理你的反馈。
+ */
+wx.ready(function () {
+
+  // 2.2 监听“分享到朋友圈”按钮点击、自定义分享内容及分享结果接口
+  $("#shareM").click(function() {
+	  if(null == [[${webAccessToekn.openid}]]){
+		  $.alert('关注公众号后才能进行分享哦~')
+	  }
+	  wx.onMenuShareTimeline({
+	      title: '幸运转转转-我离一等奖就只差一步,快来猪我一臂之力吧,急急如律令,转转转,中中中~~~~',
+	      link: 'http://www.herocenter.cn/wx/marketing/lottery',
+	      imgUrl: 'http://www.herocenter.cn/img/lottery/activity-lottery-1.png',
+	      trigger: function (res) {
+	        // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+	        //alert('用户点击分享到朋友圈');
+	        $(".weui-share").fadeOut();$(this).removeClass('fadeOut');
+	      },
+	      success: function (res) {
+	    	addChanceForShare();
+	      },
+	      cancel: function (res) {
+	        //alert('已取消');
+	      },
+	      fail: function (res) {
+	        alert(JSON.stringify(res));
+	      }
+	    });
+	  
+	  
+	  wx.onMenuShareAppMessage({
+	      title: '幸运转转转！',
+	      desc: '我离一等奖就只差一步,快来猪我一臂之力吧,急急如律令,转转转,中中中~~~~',
+          link: 'http://www.herocenter.cn/wx/marketing/lottery',
+          imgUrl: 'http://www.herocenter.cn/img/lottery/activity-lottery-1.png',
+	      trigger: function (res) {
+	        // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+	            $(".weui-share").fadeOut();$(this).removeClass('fadeOut');
+	      },
+	      success: function (res) {
+	    	  addChanceForShare();
+	      },
+	      cancel: function (res) {
+	      },
+	      fail: function (res) {
+	        alert(JSON.stringify(res));
+	      }
+	    });
+	  
+	  
+	  
+        $('.weui-share').show().addClass('fadeIn');
+  });
+});
+
+wx.error(function (res) {
+  alert(res.errMsg);
+});
+
+
+
+function addChanceForShare(){
+	$.ajax({
+        type : 'POST',
+        url : '/wx/marketing/addChanceForShare',
+        data: {"openid":[[${webAccessToekn.openid}]]},
+        cache : false,
+        error : function() {
+            $.alert('出错啦!');
+        },
+        success : function(json) {
+           if(json=="sharesuccess"){
+        	   window.location.href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxa7e93a3f7bfc8065&redirect_uri=http%3A%2F%2Fherocenter.cn%2Fwx%2Fmarketing%2Flottery&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
+        	   //window.location.reload();
+        	   //$.alert('关注公众号后进行分享才会增加抽奖次数哦~');
+           }else if(json=="needsubscribe"){
+        	   $.alert('关注公众号后进行分享才会增加抽奖次数哦~');
+           }else if(json=="hasshared"){
+               $.alert('今天已经分享过了,明天再来吧~');
+           }else{
+        	   $.alert('未知异常');
+           }
+        }
+    });
+}
+
+
+var pb = $.photoBrowser({
+      items: [
+        {
+          image: "../../img/jiekoucesh_qrcode.jpg",
+          caption: "<div style='text-align:center;margin-top:30px;color:red'>长按识别二维码，进行关注</div>"
+        }
+      ]
+    });
+    
+    function showQRCode(){
+    	pb.open();
+    }
+    $(function() {
+        $("#inner").click(function() {
+                lottery();
+        });
+    });
+    function lottery() {
+        var lotteryCount = parseInt($("#lotteryCount").text()); //角度 
+        if(lotteryCount < 1){
+            $.alert('<div style="text-align:center;">无可用抽奖次数！参考获取抽奖说明~</div>');
+            return;
+        }
+        var openid = [[${webAccessToekn.openid}]]
+        $.ajax({
+            type : 'POST',
+            url : '/wx/marketing/lotteryResult',
+            data: {"openid":openid},
+            dataType : 'json',
+            cache : false,
+            error : function() {
+                $.alert('出错啦!');
+                return false;
+            },
+
+            success : function(json) {
+                $("#inner").unbind('click').css("cursor", "default");
+                var angle = parseInt(json.angle); //角度 
+                var msg = json.msg; //提示信息
+                 var count = json.lotteryCount;
+                 //修改剩余次数
+                 $("#lotteryCount").text(count);  
+                    $("#outer").rotate(
+                            { //inner内部指针转动，outer外部转盘转动
+                                duration : 5000, //转动时间 
+                                angle : 0, //开始角度 
+                                animateTo : 360 * 2 + angle, //转动角度 
+                                easing : $.easing.easeOutSine, //动画扩展 
+                                callback : function() {
+                                	$.alert('抽奖结果是：' + msg,function(){
+                                         $("#inner").bind('click',function(){
+                                                lottery();
+                                            }).css("cursor", "pointer")
+                                    });
+                                }
+                            });
+                
+            }
+        });
+    }
+</script>
+
+</html>

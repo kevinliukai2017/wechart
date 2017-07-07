@@ -1,0 +1,51 @@
+package com.wechart.controller;
+
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.jeewx.api.core.exception.WexinReqException;
+import org.jeewx.api.core.util.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.wechart.model.webaccesstoken.WebAccessTokenModel;
+import com.wechart.req.weixin.WebAuthAPI;
+import com.wechart.service.webauth.WebAuthService;
+import com.wechart.util.LotteryUtil;
+
+@Controller
+@RequestMapping("/wx")
+public class LotteryController {
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	@Autowired
+	WebAuthService webAuthService;
+	
+	@RequestMapping("marketing/lottery")
+	public String showLotteryPage(Model model,HttpServletRequest request) throws WexinReqException{
+		String code = request.getParameter("code");
+		String state = request.getParameter("state");
+		logger.info("getWebAccessToken--code: " + code  + ",state: " + state);
+		WebAccessTokenModel webAccessToken = webAuthService.getWebAccessToken(code);
+		model.addAttribute("webAccessToekn", webAccessToken);
+		return "marketing/lottery";
+	}
+	
+	//text/plain;charset=UTF-8
+	//application/json;charset=UTF-8
+	@RequestMapping(value = "/lotteryResult" , produces = "text/plain;charset=UTF-8")
+	@ResponseBody
+	public String lotteryResult(){
+		Object result[] = LotteryUtil.award(LotteryUtil.prizeArr);
+		
+		logger.info("转动角度:"+result[0]+"\t奖项ID:"+result[1]+"\t提示信息:"+result[2]);
+		return "{\"angle\":\""+result[0]+"\",\"msg\":\""+result[2]+"\"}";
+	} 
+}

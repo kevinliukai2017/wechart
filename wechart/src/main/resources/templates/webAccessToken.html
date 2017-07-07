@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta content="text/html;charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link th:href="@{bootstrap/dist/css/bootstrap.min.css}" rel="stylesheet" />
+<link th:href="@{bootstrap/dist/css/bootstrap-theme.min.css}"
+	rel="stylesheet" />
+<title>授权页面</title>
+</head>
+<body>
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h3 class="panel-title">授权码</h3>
+		</div>
+
+		<div class="panel-body">
+			<table class="table table-hover table-responsive" style="word-break:break-all; word-wrap:break-all;">
+				<thead>
+					<tr>
+						<th>access_token</th>
+						<th>expires_in</th>
+						<th>refresh_token</th>
+						<th>openid</th>
+						<th>scope</th>
+						<th>request_time</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><span th:text="${webAccessToekn.access_token}"></span></td>
+						<td><span th:text="${webAccessToekn.expires_in}"></span></td>
+						<td><span th:text="${webAccessToekn.refresh_token}"></span></td>
+						<td><span th:text="${webAccessToekn.openid}"></span></td>
+						<td><span th:text="${webAccessToekn.scope}"></span></td>
+						<td><span th:text="${webAccessToekn.request_time}"></span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+
+</body>
+</html>

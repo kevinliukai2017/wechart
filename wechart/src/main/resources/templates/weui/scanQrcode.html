@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+	content="width=device-width,initial-scale=1,user-scalable=0" />
+<title>WeUI</title>
+<!-- 引入 WeUI -->
+<link rel="stylesheet" th:href="@{weui/dist/style/weui.css}" />
+<script th:src="@{jquery-3.2.1.js}" type="text/javascript"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+</head>
+<body>
+
+
+	<div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">二维码</label></div>
+        <div class="weui-cell__bd">
+            <input class="weui-input" id="id_securityCode_input" placeholder="请扫码"/>
+        </div>
+    </div>
+
+
+	<a href="javascript:;" class="weui-btn weui-btn_primary" id="scanQRCode">扫码</a>
+	<a href="javascript:;" class="weui-btn weui-btn_primary" id="shareM">分享</a>
+
+	<script th:inline="javascript" type="text/javascript">
+		$(function() {
+			console.log([[${timestamp}]]);
+			var timestamp = [[${timestamp}]];//时间戳
+			var nonceStr = [[${nonceStr}]];//随机串
+			var signature = [[${signature}]];//签名
+			wx.config({
+				debug : true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+				appId : 'wxa7e93a3f7bfc8065', // 必填，公众号的唯一标识
+				timestamp : timestamp, // 必填，生成签名的时间戳
+				nonceStr : nonceStr, // 必填，生成签名的随机串
+				signature : signature,// 必填，签名，见附录1
+				jsApiList : [ 'scanQRCode' ]
+			// 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+			});
+		});
+
+		$("#scanQRCode").click(function() {
+			wx.scanQRCode({
+				// 默认为0，扫描结果由微信处理，1则直接返回扫描结果
+				needResult : 1,
+				desc : 'scanQRCode desc',
+				success : function(res) {
+					//扫码后获取结果参数赋值给Input
+					var url = res.resultStr;
+					//商品条形码，取","后面的
+					if (url.indexOf(",") >= 0) {
+						var tempArray = url.split(',');
+						var tempNum = tempArray[1];
+						$("#id_securityCode_input").val(tempNum);
+					} else {
+						$("#id_securityCode_input").val(url);
+					}
+				}
+			});
+		});
+		
+		  // 2. 分享接口
+		  // 2.1 监听“分享给朋友”，按钮点击、自定义分享内容及分享结果接口
+		 $("#shareM").click(function() {
+		    wx.onMenuShareAppMessage({
+		      title: '互联网之子',
+		      desc: '在长大的过程中，我才慢慢发现，我身边的所有事，别人跟我说的所有事，那些所谓本来如此，注定如此的事，它们其实没有非得如此，事情是可以改变的。更重要的是，有些事既然错了，那就该做出改变。',
+		      link: 'http://www.herocenter.cn/wx/weuidemo',
+		      imgUrl: 'http://www.herocenter.cn/wx/img/tt.png',
+		      trigger: function (res) {
+		        // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+		        alert('用户点击发送给朋友');
+		      },
+		      success: function (res) {
+		        alert('已分享');
+		      },
+		      cancel: function (res) {
+		        alert('已取消');
+		      },
+		      fail: function (res) {
+		        alert(JSON.stringify(res));
+		      }
+		    });
+		    alert('已注册获取“发送给朋友”状态事件');
+		  });
+	</script>
+</body>
+</html>

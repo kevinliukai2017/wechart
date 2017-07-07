@@ -1,0 +1,51 @@
+package com.wechart.cofig;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
+
+@Component
+@ConfigurationProperties(prefix = "wx")
+@PropertySource("classpath:config/wx.properties")
+public class WXSettings {
+	
+	private String appId;
+	private String token;
+	private String encodingAESKey;
+	private String ak;
+	private String coordType;
+	
+	public String getAppId() {
+		return appId;
+	}
+	public void setAppId(String appId) {
+		this.appId = appId;
+	}
+	public String getToken() {
+		return token;
+	}
+	public void setToken(String token) {
+		this.token = token;
+	}
+	public String getEncodingAESKey() {
+		return encodingAESKey;
+	}
+	public void setEncodingAESKey(String encodingAESKey) {
+		this.encodingAESKey = encodingAESKey;
+	}
+	public String getAk() {
+		return ak;
+	}
+	public void setAk(String ak) {
+		this.ak = ak;
+	}
+	public String getCoordType() {
+		return coordType;
+	}
+	public void setCoordType(String coordType) {
+		this.coordType = coordType;
+	}
+	
+	
+
+}

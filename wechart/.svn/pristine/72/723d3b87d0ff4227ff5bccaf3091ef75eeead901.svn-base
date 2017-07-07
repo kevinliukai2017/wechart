@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport"
+	content="width=device-width,initial-scale=1,user-scalable=0" />
+<title>幸运大转盘</title>
+<!-- 引入 WeUI -->
+<link rel="stylesheet" th:href="@{/css/weui/dist/style/weui.css}" />
+<!-- 转盘css -->
+<link rel="stylesheet" th:href="@{/css/lottery/style.css}" />
+<!-- 引入js -->
+<script th:src="@{/js/weuijs/dist/weui.js}" type="text/javascript"></script>
+<script th:src="@{/js/jquery-3.2.1.js}" type="text/javascript"></script>
+<script th:src="@{/js/jQueryRotate.2.2.js}" type="text/javascript"></script>
+<script th:src="@{/js/jquery.easing.min.js}" type="text/javascript"></script>
+<script th:inline="javascript" type="text/javascript">
+	$(function() {
+		$("#inner").click(function() {
+			lottery();
+		});
+	});
+	function lottery() {
+		var openid = [[${webAccessToekn.openid}]]
+		$.ajax({
+			type : 'POST',
+			url : '/wx/marketing/lotteryResult',
+			data: {"openid":"aa"},
+			dataType : 'json',
+			cache : false,
+			error : function() {
+				weui.alert('出错啦!');
+				return false;
+			},
+
+			success : function(json) {
+				$("#inner").unbind('click').css("cursor", "default");
+				var angle = parseInt(json.angle); //角度 
+				var msg = json.msg; //提示信息
+				$("#outer").rotate(
+						{ //inner内部指针转动，outer外部转盘转动
+							duration : 5000, //转动时间 
+							angle : 0, //开始角度 
+							animateTo : 360 * 3 + angle, //转动角度 
+							easing : $.easing.easeOutSine, //动画扩展 
+							callback : function() {
+								weui.confirm(msg + '\n还要再来一次吗？', function() {
+									lottery();
+								}, function() {
+									$("#inner").bind('click',function(){
+										lottery();
+									}).css("cursor", "pointer")
+								});
+							}
+						});
+			}
+		});
+	}
+</script>
+
+
+</head>
+<body class="activity-lottery-winning">
+
+	<div class="main">
+		<script type="text/javascript">
+			var loadingObj = new loading(document.getElementById('loading'), {
+				radius : 20,
+				circleLineWidth : 8
+			});
+			loadingObj.show();
+		</script>
+
+		<div id="outercont">
+			<div id="outer-cont" style="overflow: hidden;">
+				<div id="outer">
+					<img src="../../img/lottery/activity-lottery-1.png" width="310px" />
+				</div>
+			</div>
+			<div id="inner-cont">
+				<div id="inner">
+					<img src="../../img/lottery/activity-lottery-2.png" />
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<div style="max-width: 380px; margin: -18px auto 0px auto;">
+		<div
+			style="padding: 0 5px 0px 10px; font-weight: bold;  font-size: 16px;">奖品设置</div>
+		<div
+			style="padding: 0 10px 0px 20px; margin-top: 10px;font-size: 14px;">
+			一等奖:
+			<p style="padding: 0 2px 0px 8px; font-size: 12px;">水滴印台BD＋GD系列各一套（一色一只）＋合璧堂商城兑换券1000元</p>
+		</div>
+		<div style="padding: 0 10px 0px 20px; font-size: 14px;">
+			二等奖:
+			<p style="padding: 0 2px 0px 8px; font-size: 12px;">水滴印台MD系列一套（一色一只）＋合璧堂商城兑换券1000元</p>
+		</div>
+		<div style="padding: 0 10px 0px 20px;  font-size: 14px;">
+			三等奖:
+			<p style="padding: 0 2px 0px 8px; font-size: 12px;">Teresa Collins 图章制作器，价值人民币1360元</p>
+		</div>
+	</div>
+
+	<a href="http://localhost:8080/abcd" class="weui-btn weui-btn_primary"
+		style="position: absolute; bottom: 0px; width: 100%" id="shareM">领取</a>
+</body>
+</html>
