@@ -1,6 +1,0 @@
-spring.profiles.active=prod
-
-spring.thymeleaf.content-type=text/html
-spring.thymeleaf.cache=false
-spring.thymeleaf.mode =LEGACYHTML5
-

@@ -1,7 +1,0 @@
-#微信配置
-wx.appId=wxa7e93a3f7bfc8065
-wx.token=herocenter
-wx.encodingAESKey=j4WVYh03YsMmZZg47bl8tvk1JPIUGi1oA9lx0IwgR14
-wx.appsecret=4b91436f04c23ec0b5810e1a5be49d34
-wx.redirectURL=http://herocenter.cn/wx/getWebAccessToken
-

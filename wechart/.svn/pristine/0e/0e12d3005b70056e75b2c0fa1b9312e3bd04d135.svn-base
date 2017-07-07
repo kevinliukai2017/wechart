@@ -1,6 +1,0 @@
-
-.idea/
-node_modules/
-*.log
-/docs/_book/
-uploader-server/uploads
